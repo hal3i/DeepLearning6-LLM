@@ -1,7 +1,9 @@
 from collections import defaultdict
 
-def count_pairs(ids):
-    counts = defaultdict(int)
+def count_pairs(ids, counts=None):
+    if counts is None:
+        counts = defaultdict(int)
+
     for pair in zip(ids, ids[1:]):
         counts[pair] += 1
     return counts
@@ -20,14 +22,17 @@ def merge(ids, pair, new_id):
     
     return merged_ids
 
-def train_bpe(text, vocab_size):
-    ids = list(text.encode("utf-8"))
+def train_bpe(input_text, vocab_size, end_token="<|endoftext|>"):
+    texts = input_text.split(end_token)
+    ids_list = [list(text.encode("utf-8")) for text in texts]
 
-    num_merges = vocab_size - 256
+    num_merges = vocab_size - 256 - 1
     merge_rules = {}
 
     for step in range(num_merges):
-        counts = count_pairs(ids)
+        counts = defaultdict(int)
+        for ids in ids_list:
+            counts = count_pairs(ids, counts)
 
         if not counts:
             break
@@ -37,6 +42,7 @@ def train_bpe(text, vocab_size):
         new_id = 256 + step
         merge_rules[best_pair] = new_id
 
-        ids = merge(ids, best_pair, new_id)
+        for i in range(len(ids_list)):
+            ids_list[i] = merge(ids_list[i], best_pair, new_id)
 
     return merge_rules
