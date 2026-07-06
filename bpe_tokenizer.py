@@ -2,6 +2,7 @@ from bpe_train import merge
 from pretokenize import pretokenize
 import re
 import tqdm
+import pickle
 
 class BPETokenizer:
     def __init__(self, merge_rules, end_token="<|endoftext|>"):
@@ -47,3 +48,9 @@ class BPETokenizer:
 
         text = text_bytes.decode("utf-8", errors="replace")
         return text
+    
+    @staticmethod
+    def load_from(filepath):
+        with open(filepath, "rb") as f:
+            merge_rules = pickle.load(f)
+        return BPETokenizer(merge_rules
