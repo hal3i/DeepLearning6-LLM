@@ -1,5 +1,7 @@
 from bpe_train import merge
+from pretokenize import pretokenize
 import re
+import tqdm
 
 class BPETokenizer:
     def __init__(self, merge_rules, end_token="<|endoftext|>"):
@@ -22,17 +24,19 @@ class BPETokenizer:
             ids = merge(ids, merge_pair, new_id)
         return ids
 
-    def encode(self, input_text):
+    def encode(self, input_text, show_progress=False):
         pattern = '(' + re.escape(self.end_token) + ')'
         texts = re.split(pattern, input_text)
         all_ids = []
 
+        texts = tqdm(texts, desc="Encoding") if show_progress else texts
         for text in texts:
             if text == self.end_token:
                 all_ids.append(self.end_token_id)
             else:
-                ids = self._encode_text(text)
-                all_ids.extend(ids)
+                for pretoken in pretokenize(text):
+                    ids = self._encode_text(pretoken)
+                    all_ids.extend(ids)
             
         return all_ids
 

@@ -1,5 +1,6 @@
 import unittest
 from bpe_tokenizer import BPETokenizer
+from bpe_train import train_bpe
 
 class TestBPETokenizer(unittest.TestCase):
     def test_encode_decode(self):
@@ -21,6 +22,20 @@ class TestBPETokenizer(unittest.TestCase):
 
         self.assertEqual(ids, [72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33, 259])
         self.assertEqual(decoded, "Hello world!<|endoftext|>")
+
+    def test_encode_decode_pretoken(self):
+        sample_text = "Say hello! Why hello? Just Hello.<|endoftext|>Godd morning!"
+        merge_rules = train_bpe(sample_text, vocab_size=270)
+        sut = BPETokenizer(merge_rules)
+
+        ids = sut.encode("Say hello!")
+        decoded = sut.decode(ids)
+
+        self.assertEqual(ids, [262, 260, 33])
+        self.assertEqual(decoded, "Say hello!")
+        self.assertEqual(sut.decode([262]), 'Say')
+        self.assertEqual(sut.decode([260]), ' hello')
+        self.assertEqual(sut.decode([33]), '!')
 
 if __name__ == '__main__':
     unittest.main()
