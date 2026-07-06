@@ -1,4 +1,6 @@
 from collections import defaultdict
+from tqdm import tqdm
+from pretokenize import pretokenize
 
 def count_pairs(ids, counts=None):
     if counts is None:
@@ -24,12 +26,15 @@ def merge(ids, pair, new_id):
 
 def train_bpe(input_text, vocab_size, end_token="<|endoftext|>"):
     texts = input_text.split(end_token)
-    ids_list = [list(text.encode("utf-8")) for text in texts]
+    ids_list = []
+    for text in texts:
+        for pretoken in pretokenize(text):
+            ids_list.append(list(pretoken.encode("utf-8")))
 
     num_merges = vocab_size - 256 - 1
     merge_rules = {}
 
-    for step in range(num_merges):
+    for step in tqdm(range(num_merges), desc="Traning BPE"):
         counts = defaultdict(int)
         for ids in ids_list:
             counts = count_pairs(ids, counts)

@@ -10,7 +10,7 @@ class BpeTrainTest(unittest.TestCase):
 
     def test_bpe_train(self):
         merge_rules = sut.train_bpe("Hello world!<|endoftext|>This is BPE raining.", vocab_size=260)
-        self.assertEqual(merge_rules, {(105, 115): 256, (256, 32): 257, (105, 110): 258})
+        self.assertEqual(merge_rules, {(105, 115): 256, (105, 110): 257, (72, 101): 258})
 
 if __name__ == '__main__':
     unittest.main()
