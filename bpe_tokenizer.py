@@ -1,7 +1,7 @@
 from bpe_train import merge
 from pretokenize import pretokenize
 import re
-import tqdm
+from tqdm import tqdm
 import pickle
 
 class BPETokenizer:
@@ -53,4 +53,4 @@ class BPETokenizer:
     def load_from(filepath):
         with open(filepath, "rb") as f:
             merge_rules = pickle.load(f)
-        return BPETokenizer(merge_rules
+        return BPETokenizer(merge_rules)
